@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+
+# Models (if you want to exclude large model files)
+# Uncomment the line below if you don't want to commit models
+# models/*.glb
+# models/*.gltf
+# models/*.obj
+# models/*.fbx
+
+# Build files (if you add a build process later)
+dist/
+build/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Environment
+.env
+.env.local

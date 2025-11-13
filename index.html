@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projectile Motion Simulation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Info Panel -->
+    <div class="info-panel">
+        <h1>Projectile Motion</h1>
+        <div class="calculations">
+            <div class="calc-row">
+                <span class="calc-label">Height</span>
+                <span class="calc-value" id="launchHeightDisplay">0 m</span>
+            </div>
+            <div class="calc-row">
+                <span class="calc-label">Velocity</span>
+                <span class="calc-value" id="launchVelocityDisplay">7 m/s</span>
+            </div>
+            <div class="calc-row">
+                <span class="calc-label">Angle</span>
+                <span class="calc-value" id="launchAngleDisplay">45°</span>
+            </div>
+            <div class="calc-divider"></div>
+            <div class="calc-row">
+                <span class="calc-label">vₓ</span>
+                <span class="calc-value" id="vxDisplay">4.95 m/s</span>
+            </div>
+            <div class="calc-row">
+                <span class="calc-label">vᵧ</span>
+                <span class="calc-value" id="vyDisplay">4.95 m/s</span>
+            </div>
+            <div class="calc-divider"></div>
+            <div class="calc-row">
+                <span class="calc-label">Max Height</span>
+                <span class="calc-value" id="maxHeightDisplay">1.25 m</span>
+            </div>
+            <div class="calc-row">
+                <span class="calc-label">Range</span>
+                <span class="calc-value" id="maxRangeDisplay">5.00 m</span>
+            </div>
+            <div class="calc-row">
+                <span class="calc-label">Time of Flight</span>
+                <span class="calc-value" id="timeOfFlightDisplay">1.01 s</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- Controls Panel -->
+    <div class="controls-panel">
+        <h2 class="panel-title">Controls</h2>
+        
+        <div class="control-group">
+            <label for="heightSlider">
+                <span class="control-label">Height</span>
+                <span class="control-value"><span id="heightValue">1.5</span> m</span>
+            </label>
+            <input type="range" id="heightSlider" min="0" max="5" step="0.1" value="1.5">
+        </div>
+        
+        <div class="control-group">
+            <label for="velocitySlider">
+                <span class="control-label">Velocity</span>
+                <span class="control-value"><span id="velocityValue">10</span> m/s</span>
+            </label>
+            <input type="range" id="velocitySlider" min="1" max="20" step="0.5" value="10">
+        </div>
+        
+        <div class="control-group">
+            <label for="angleSlider">
+                <span class="control-label">Angle</span>
+                <span class="control-value"><span id="angleValue">30</span>°</span>
+            </label>
+            <input type="range" id="angleSlider" min="0" max="90" step="1" value="30">
+        </div>
+
+        <div class="checkbox-group">
+            <label class="checkbox-label">
+                <input type="checkbox" id="gridToggle" checked>
+                <span class="checkbox-text">Grid</span>
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="vectorToggle" checked>
+                <span class="checkbox-text">Vector</span>
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="componentsToggle" checked>
+                <span class="checkbox-text">Components</span>
+            </label>
+        </div>
+
+        <div class="button-group">
+            <button id="shootBtn" class="btn btn-shoot">Shoot</button>
+            <button id="resetBtn" class="btn btn-reset">Reset</button>
+            <button id="theoryBtn" class="btn btn-theory">Theory</button>
+        </div>
+    </div>
+
+    <!-- Theory Modal -->
+    <div id="theoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Projectile Motion Theory</h2>
+            <div class="theory-content">
+                <h3>Key Equations:</h3>
+                <p><strong>Horizontal velocity:</strong> vₓ = v₀ cos θ</p>
+                <p><strong>Vertical velocity:</strong> vᵧ = v₀ sin θ</p>
+                <p><strong>Maximum height:</strong> H = y₀ + (v₀ sin θ)² / (2g)</p>
+                <p><strong>Time of flight:</strong> t = [v₀ sin θ + √((v₀ sin θ)² + 2gy₀)] / g</p>
+                <p><strong>Range:</strong> R = vₓ × t</p>
+                <p><strong>Position at time t:</strong></p>
+                <p>x(t) = v₀ cos θ × t</p>
+                <p>y(t) = y₀ + v₀ sin θ × t - ½gt²</p>
+                <p><strong>Where:</strong></p>
+                <ul>
+                    <li>g = 9.81 m/s² (gravitational acceleration)</li>
+                    <li>v₀ = initial velocity</li>
+                    <li>θ = launch angle</li>
+                    <li>y₀ = initial height</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OBJ Loader -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <!-- Optional: MTL Loader for materials -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
+    <!-- Orbit Controls for camera interaction -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script type="module" src="main.js"></script>
+</body>
+</html>
