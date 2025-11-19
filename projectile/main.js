@@ -30,13 +30,13 @@ const CONFIG = {
         GROUND_COLOR: 0x4a8c3f
     },
     CAMERA: {
-        FOV: 60,
-        POSITION: { x: 8, y: 6, z: 12 },
-        LOOK_AT: { x: 5, y: 2, z: 0 }
+        FOV: 45,
+        POSITION: { x: 13.72, y: 8.91, z: 14.84 },
+        LOOK_AT: { x: 11.96, y: 3.00, z: 1.21 }
     },
     CONTROLS: {
         DAMPING_FACTOR: 0.05,
-        MIN_DISTANCE: 5,
+        MIN_DISTANCE: 10,
         MAX_DISTANCE: 50
     },
     ANIMATION: {
@@ -108,7 +108,10 @@ function init() {
 
 function initScene() {
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(CONFIG.SCENE.SKY_COLOR);
+    scene.background = new THREE.Color(0x1a1d2e);
+    
+    // Add fog for depth
+    scene.fog = new THREE.Fog(0x1a1d2e, 30, 100);
 }
 
 function initCamera() {
@@ -131,25 +134,43 @@ function initRenderer() {
 }
 
 function initLights() {
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    // Ambient light - brighter for better visibility
+    const ambientLight = new THREE.AmbientLight(0x6a7a9a, 0.8);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    // Main directional light - brighter and warmer
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8);
     directionalLight.position.set(10, 20, 10);
     directionalLight.castShadow = true;
     directionalLight.shadow.camera.left = -20;
     directionalLight.shadow.camera.right = 20;
     directionalLight.shadow.camera.top = 20;
     directionalLight.shadow.camera.bottom = -20;
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
+    directionalLight.shadow.bias = -0.0001;
     scene.add(directionalLight);
+    
+    // Hemisphere light for better ambient lighting
+    const hemisphereLight = new THREE.HemisphereLight(0x9bb5ff, 0x3a4a6a, 1.0);
+    scene.add(hemisphereLight);
+    
+    // Brighter accent lights
+    const accentLight1 = new THREE.PointLight(0x60a5fa, 1.2, 35);
+    accentLight1.position.set(-5, 5, 5);
+    scene.add(accentLight1);
+    
+    const accentLight2 = new THREE.PointLight(0xa78bfa, 0.8, 30);
+    accentLight2.position.set(10, 3, -5);
+    scene.add(accentLight2);
 }
 
 function initGround() {
     const groundGeometry = new THREE.PlaneGeometry(100, 100);
     const groundMaterial = new THREE.MeshStandardMaterial({ 
-        color: CONFIG.SCENE.GROUND_COLOR,
-        roughness: 0.8,
-        metalness: 0.2
+        color: 0x1a2530,
+        roughness: 0.85,
+        metalness: 0.15
     });
     ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.rotation.x = -Math.PI / 2;
@@ -158,7 +179,7 @@ function initGround() {
 }
 
 function initGrid() {
-    gridHelper = new THREE.GridHelper(100, 100, 0x333333, 0x555555);
+    gridHelper = new THREE.GridHelper(100, 100, 0x5a7aa0, 0x3a4a6a);
     gridHelper.position.y = 0.01;
     scene.add(gridHelper);
 }
@@ -172,6 +193,7 @@ function initControls() {
     controls.maxDistance = CONFIG.CONTROLS.MAX_DISTANCE;
     controls.maxPolarAngle = Math.PI / 2;
     controls.target.set(CONFIG.CAMERA.LOOK_AT.x, CONFIG.CAMERA.LOOK_AT.y, CONFIG.CAMERA.LOOK_AT.z);
+    controls.update();
 }
 
 function initPlatform() {
@@ -182,9 +204,11 @@ function initPlatform() {
         CONFIG.PLATFORM.RADIAL_SEGMENTS
     );
     const material = new THREE.MeshStandardMaterial({
-        color: CONFIG.PLATFORM.COLOR,
-        roughness: 0.8,
-        metalness: 0.2
+        color: 0x6a7a8a,
+        roughness: 0.6,
+        metalness: 0.4,
+        emissive: 0x3a4a5a,
+        emissiveIntensity: 0.3
     });
     
     platform = new THREE.Mesh(geometry, material);
@@ -203,15 +227,31 @@ function initLandingMarker() {
         CONFIG.LANDING_MARKER.SEGMENTS
     );
     const material = new THREE.MeshBasicMaterial({
-        color: CONFIG.LANDING_MARKER.COLOR,
+        color: 0xff5555,
         transparent: true,
-        opacity: CONFIG.LANDING_MARKER.OPACITY,
+        opacity: 0.9,
         side: THREE.DoubleSide
     });
     
     landingMarker = new THREE.Mesh(geometry, material);
     landingMarker.rotation.x = -Math.PI / 2; // Lay flat on ground
     landingMarker.position.y = 0.02; // Slightly above ground to prevent z-fighting
+    
+    // Add brighter glow effect
+    const glowGeometry = new THREE.CircleGeometry(
+        CONFIG.LANDING_MARKER.RADIUS * 1.5,
+        CONFIG.LANDING_MARKER.SEGMENTS
+    );
+    const glowMaterial = new THREE.MeshBasicMaterial({
+        color: 0xff5555,
+        transparent: true,
+        opacity: 0.4,
+        side: THREE.DoubleSide
+    });
+    const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+    glow.rotation.x = -Math.PI / 2;
+    glow.position.y = 0.01;
+    landingMarker.add(glow);
     
     scene.add(landingMarker);
 }
@@ -339,13 +379,26 @@ function onCannonLoaded(obj) {
 function createProjectile() {
     const geometry = new THREE.SphereGeometry(CONFIG.PROJECTILE.RADIUS, 32, 32);
     const material = new THREE.MeshStandardMaterial({ 
-        color: CONFIG.PROJECTILE.COLOR,
-        metalness: 0.5,
-        roughness: 0.2
+        color: 0x60a5fa,
+        metalness: 0.8,
+        roughness: 0.1,
+        emissive: 0x60a5fa,
+        emissiveIntensity: 0.5
     });
     
     projectile = new THREE.Mesh(geometry, material);
     projectile.castShadow = true;
+    
+    // Add brighter glow effect
+    const glowGeometry = new THREE.SphereGeometry(CONFIG.PROJECTILE.RADIUS * 1.5, 16, 16);
+    const glowMaterial = new THREE.MeshBasicMaterial({
+        color: 0x60a5fa,
+        transparent: true,
+        opacity: 0.5,
+        side: THREE.BackSide
+    });
+    const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+    projectile.add(glow);
     
     const pos = getProjectileStartPosition();
     projectile.position.set(pos.x, pos.y, pos.z);
@@ -386,8 +439,10 @@ function getProjectileStartPosition() {
 
 function createTrajectoryLine() {
     const material = new THREE.LineBasicMaterial({ 
-        color: CONFIG.TRAJECTORY.COLOR, 
-        linewidth: CONFIG.TRAJECTORY.LINEWIDTH
+        color: 0xc4b5fd, 
+        linewidth: 2,
+        transparent: true,
+        opacity: 0.9
     });
     const geometry = new THREE.BufferGeometry();
     trajectoryLine = new THREE.Line(geometry, material);
@@ -406,7 +461,7 @@ function createMainVelocityArrow() {
         new THREE.Vector3(1, 1, 0).normalize(),
         new THREE.Vector3(startPos.x, startPos.y, startPos.z),
         2,
-        CONFIG.VELOCITY_ARROW.TOTAL_COLOR,
+        0xa78bfa,
         CONFIG.VELOCITY_ARROW.HEAD_LENGTH,
         CONFIG.VELOCITY_ARROW.HEAD_WIDTH
     );
@@ -418,8 +473,8 @@ function createComponentVelocityArrows() {
     const origin = new THREE.Vector3(startPos.x, startPos.y, startPos.z);
     
     componentArrows = {
-        x: createComponentArrow(origin, new THREE.Vector3(1, 0, 0), CONFIG.VELOCITY_ARROW.VX_COLOR),
-        y: createComponentArrow(origin, new THREE.Vector3(0, 1, 0), CONFIG.VELOCITY_ARROW.VY_COLOR)
+        x: createComponentArrow(origin, new THREE.Vector3(1, 0, 0), 0xf87171),
+        y: createComponentArrow(origin, new THREE.Vector3(0, 1, 0), 0x4ade80)
     };
 }
 

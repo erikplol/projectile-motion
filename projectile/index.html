@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Gerak Parabola</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../index.html" class="back-button">← Kembali</a>
+    <a href="../harmonic/" class="next-simulation-button">
+        <span>Bandul Sederhana</span>
+        <span>→</span>
+    </a>
+
+    <!-- Left Sidebar - Info -->
+    <div class="sidebar-left">
+        <div class="info-panel">
+            <h1>Gerak Parabola</h1>
+            <div class="calculations">
+                <div class="calc-row">
+                    <span class="calc-label">Tinggi</span>
+                    <span class="calc-value" id="launchHeightDisplay">0 m</span>
+                </div>
+                <div class="calc-row">
+                    <span class="calc-label">Kecepatan</span>
+                    <span class="calc-value" id="launchVelocityDisplay">7 m/s</span>
+                </div>
+                <div class="calc-row">
+                    <span class="calc-label">Sudut</span>
+                    <span class="calc-value" id="launchAngleDisplay">45°</span>
+                </div>
+                <div class="calc-divider"></div>
+                <div class="calc-row">
+                    <span class="calc-label">vₓ</span>
+                    <span class="calc-value" id="vxDisplay">4.95 m/s</span>
+                </div>
+                <div class="calc-row">
+                    <span class="calc-label">vᵧ</span>
+                    <span class="calc-value" id="vyDisplay">4.95 m/s</span>
+                </div>
+                <div class="calc-divider"></div>
+                <div class="calc-row">
+                    <span class="calc-label">Tinggi Maksimum</span>
+                    <span class="calc-value" id="maxHeightDisplay">1.25 m</span>
+                </div>
+                <div class="calc-row">
+                    <span class="calc-label">Jarak</span>
+                    <span class="calc-value" id="maxRangeDisplay">5.00 m</span>
+                </div>
+                <div class="calc-row">
+                    <span class="calc-label">Waktu Tempuh</span>
+                    <span class="calc-value" id="timeOfFlightDisplay">1.01 s</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- Right Sidebar - Controls -->
+    <div class="sidebar-right">
+        <div class="controls-panel">
+        <h2 class="panel-title">Kontrol</h2>
+        
+        <div class="control-group">
+            <label for="heightSlider">
+                <span class="control-label">Tinggi</span>
+                <span class="control-value"><span id="heightValue">1.5</span> m</span>
+            </label>
+            <input type="range" id="heightSlider" min="0" max="5" step="0.1" value="1.5">
+        </div>
+        
+        <div class="control-group">
+            <label for="velocitySlider">
+                <span class="control-label">Kecepatan</span>
+                <span class="control-value"><span id="velocityValue">10</span> m/s</span>
+            </label>
+            <input type="range" id="velocitySlider" min="1" max="20" step="0.5" value="10">
+        </div>
+        
+        <div class="control-group">
+            <label for="angleSlider">
+                <span class="control-label">Sudut</span>
+                <span class="control-value"><span id="angleValue">30</span>°</span>
+            </label>
+            <input type="range" id="angleSlider" min="0" max="90" step="1" value="30">
+        </div>
+
+        <div class="checkbox-group">
+            <label class="checkbox-label">
+                <input type="checkbox" id="gridToggle" checked>
+                <span class="checkbox-text">Grid</span>
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="vectorToggle" checked>
+                <span class="checkbox-text">Vektor</span>
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="componentsToggle" checked>
+                <span class="checkbox-text">Komponen</span>
+            </label>
+        </div>
+
+        <div class="button-group">
+            <button id="shootBtn" class="btn btn-shoot">Tembak</button>
+            <button id="resetBtn" class="btn btn-reset">Reset</button>
+            <button id="theoryBtn" class="btn btn-theory">Teori</button>
+        </div>
+        </div>
+    </div>
+
+    <!-- Theory Modal -->
+    <div id="theoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Teori Gerak Parabola</h2>
+            <div class="theory-content">
+                <h3>Apa itu Gerak Parabola?</h3>
+                <p>Gerak parabola adalah kombinasi dari dua gerak sekaligus:</p>
+                <ul>
+                    <li><strong>Gerak Lurus Beraturan (GLB)</strong> pada arah horizontal (sumbu x)</li>
+                    <li><strong>Gerak Lurus Berubah Beraturan (GLBB)</strong> pada arah vertikal (sumbu y)</li>
+                </ul>
+                <p>Contoh dalam kehidupan: bola yang ditendang, air mancur, peluru meriam, atau bola basket yang dilempar ke ring.</p>
+                
+                <h3>Mengapa Lintasannya Berbentuk Parabola?</h3>
+                <p>Karena gravitasi hanya bekerja ke arah bawah (vertikal), sementara tidak ada gaya yang bekerja secara horizontal (kita abaikan hambatan udara). Ini membuat:</p>
+                <ul>
+                    <li>Kecepatan horizontal tetap konstan</li>
+                    <li>Kecepatan vertikal terus berubah (melambat saat naik, dipercepat saat turun)</li>
+                </ul>
+                <p>Kombinasi kedua gerak ini menghasilkan lintasan melengkung berbentuk parabola!</p>
+
+                <h3>Persamaan Kunci:</h3>
+                
+                <p><strong>1. Komponen Kecepatan Awal:</strong></p>
+                <p>Kecepatan awal dipecah menjadi dua komponen menggunakan trigonometri:</p>
+                <div class="formula">$$v_x = v_0 \cos\theta$$</div>
+                <p class="formula-explanation">→ Komponen horizontal (tetap konstan sepanjang lintasan)</p>
+                <div class="formula">$$v_y = v_0 \sin\theta$$</div>
+                <p class="formula-explanation">→ Komponen vertikal (berubah karena gravitasi)</p>
+                
+                <p><strong>2. Posisi pada Waktu t:</strong></p>
+                <p>Posisi objek dapat dihitung setiap saat:</p>
+                <div class="formula">$$x(t) = v_0 \cos\theta \cdot t$$</div>
+                <p class="formula-explanation">→ Jarak horizontal: kecepatan tetap × waktu (GLB)</p>
+                <div class="formula">$$y(t) = y_0 + v_0 \sin\theta \cdot t - \frac{1}{2}gt^2$$</div>
+                <p class="formula-explanation">→ Ketinggian: tinggi awal + gerak naik - efek gravitasi (GLBB)</p>
+                
+                <p><strong>3. Tinggi Maksimum:</strong></p>
+                <p>Titik tertinggi dicapai saat kecepatan vertikal = 0:</p>
+                <div class="formula">$$H = y_0 + \frac{(v_0 \sin\theta)^2}{2g}$$</div>
+                <p class="formula-explanation">→ Semakin besar sudut dan kecepatan, semakin tinggi!</p>
+                
+                <p><strong>4. Waktu Tempuh Total:</strong></p>
+                <p>Waktu hingga proyektil menyentuh tanah:</p>
+                <div class="formula">$$t = \frac{v_0 \sin\theta + \sqrt{(v_0 \sin\theta)^2 + 2gy_0}}{g}$$</div>
+                <p class="formula-explanation">→ Dipengaruhi oleh tinggi awal dan komponen vertikal kecepatan</p>
+                
+                <p><strong>5. Jarak Horizontal (Range):</strong></p>
+                <div class="formula">$$R = v_x \cdot t = v_0 \cos\theta \cdot t$$</div>
+                <p class="formula-explanation">→ Jarak maksimum dicapai saat sudut = 45° (jika $y_0 = 0$)</p>
+                
+                <h3>Apa yang Ditunjukkan Simulasi Ini?</h3>
+                <ul>
+                    <li><strong>Vektor Kecepatan (panah biru)</strong>: Menunjukkan arah dan besar kecepatan proyektil setiap saat</li>
+                    <li><strong>Komponen Kecepatan</strong>: 
+                        <ul>
+                            <li>Panah hijau (horizontal): Selalu sama panjang karena tidak ada percepatan</li>
+                            <li>Panah merah (vertikal): Berubah-ubah, mengecil saat naik, membesar saat turun</li>
+                        </ul>
+                    </li>
+                    <li><strong>Lintasan Ungu</strong>: Jejak pergerakan proyektil membentuk kurva parabola</li>
+                    <li><strong>Titik Landing (merah)</strong>: Menunjukkan di mana proyektil akan jatuh</li>
+                </ul>
+
+                <h3>Coba Eksperimen!</h3>
+                <ul>
+                    <li>Ubah sudut ke 90°: Proyektil naik lurus ke atas lalu jatuh di tempat yang sama</li>
+                    <li>Ubah sudut ke 0°: Proyektil bergerak horizontal saja</li>
+                    <li>Cari sudut optimal (sekitar 45°) untuk jarak terjauh!</li>
+                    <li>Bandingkan: kecepatan tinggi sudut kecil vs kecepatan rendah sudut besar</li>
+                </ul>
+                
+                <p><strong>Dimana:</strong></p>
+                <ul>
+                    <li>$g = 9.81 \text{ m/s}^2$ = percepatan gravitasi (konstan di permukaan Bumi)</li>
+                    <li>$v_0$ = kecepatan awal (m/s)</li>
+                    <li>$\theta$ = sudut peluncuran dari horizontal (derajat)</li>
+                    <li>$y_0$ = tinggi awal dari tanah (m)</li>
+                    <li>$t$ = waktu (s)</li>
+                    <li>$v_x$ = komponen kecepatan horizontal (tetap)</li>
+                    <li>$v_y$ = komponen kecepatan vertikal (berubah)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- KaTeX for math rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <!-- OBJ Loader -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <!-- Optional: MTL Loader for materials -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
+    <!-- Orbit Controls for camera interaction -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script type="module" src="main.js"></script>
+    <script>
+        // Render LaTeX formulas when modal opens
+        document.getElementById('theoryBtn').addEventListener('click', function() {
+            setTimeout(function() {
+                renderMathInElement(document.querySelector('.theory-content'), {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }, 100);
+        });
+    </script>
+</body>
+</html>

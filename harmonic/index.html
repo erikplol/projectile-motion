@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Bandul</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../index.html" class="back-button">← Kembali</a>
+    <a href="../projectile/" class="next-simulation-button">
+        <span>Gerak Parabola</span>
+        <span>→</span>
+    </a>
+
+    <!-- Left Sidebar - Info -->
+    <div class="sidebar-left">
+        <div class="info-panel">
+            <h1>Bandul Sederhana</h1>
+            <div class="calculations">
+                <div class="calc-row">
+                    <span class="calc-label">Sudut Awal (θ₀)</span>
+                    <span class="calc-value" id="amplitudeDisplay">30°</span>
+                </div>
+                <div class="calc-row">
+                    <span class="calc-label">Periode (T)</span>
+                    <span class="calc-value" id="periodDisplay">2.0 s</span>
+                </div>
+                <div class="calc-row">
+                    <span class="calc-label">Frekuensi (f)</span>
+                    <span class="calc-value" id="frequencyDisplay">0.5 Hz</span>
+                </div>
+                <div class="calc-divider"></div>
+                <div class="calc-row">
+                    <span class="calc-label">Sudut (θ)</span>
+                    <span class="calc-value" id="positionDisplay">30°</span>
+                </div>
+                <div class="calc-row">
+                    <span class="calc-label">Kec. Sudut (ω)</span>
+                    <span class="calc-value" id="velocityDisplay">0.00 rad/s</span>
+                </div>
+                <div class="calc-row">
+                    <span class="calc-label">Perc. Sudut (α)</span>
+                    <span class="calc-value" id="accelerationDisplay">0.00 rad/s²</span>
+                </div>
+                <div class="calc-divider"></div>
+                <div class="calc-row">
+                    <span class="calc-label">Energi Kinetik</span>
+                    <span class="calc-value" id="kineticDisplay">0.00 J</span>
+                </div>
+                <div class="calc-row">
+                    <span class="calc-label">Energi Potensial</span>
+                    <span class="calc-value" id="potentialDisplay">0.00 J</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- Right Sidebar - Controls -->
+    <div class="sidebar-right">
+        <div class="controls-panel">
+        <h2 class="panel-title">Kontrol</h2>
+        
+        <div class="control-group">
+            <label for="amplitudeSlider">
+                <span class="control-label">Sudut Awal</span>
+                <span class="control-value"><span id="amplitudeValue">30</span>°</span>
+            </label>
+            <input type="range" id="amplitudeSlider" min="5" max="85" step="5" value="30">
+        </div>
+        
+        <div class="control-group">
+            <label for="periodSlider">
+                <span class="control-label">Panjang Tali</span>
+                <span class="control-value"><span id="periodValue">3.0</span> m</span>
+            </label>
+            <input type="range" id="periodSlider" min="1" max="5" step="0.1" value="3.0">
+        </div>
+        
+        <div class="control-group">
+            <label for="massSlider">
+                <span class="control-label">Massa</span>
+                <span class="control-value"><span id="massValue">1.0</span> kg</span>
+            </label>
+            <input type="range" id="massSlider" min="0.1" max="5" step="0.1" value="1.0">
+        </div>
+
+        <div class="checkbox-group">
+            <label class="checkbox-label">
+                <input type="checkbox" id="springToggle" checked>
+                <span class="checkbox-text">Tampilkan Tali</span>
+            </label>
+        </div>
+
+        <div class="button-group">
+            <button id="startBtn" class="btn btn-shoot">Mulai</button>
+            <button id="pauseBtn" class="btn btn-reset">Jeda</button>
+            <button id="resetHarmonicBtn" class="btn btn-reset">Reset</button>
+            <button id="theoryBtn" class="btn btn-theory">Teori</button>
+        </div>
+        </div>
+    </div>
+
+    <!-- Theory Modal -->
+    <div id="theoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Teori Bandul Sederhana</h2>
+            <div class="theory-content">
+                <h3>Apa itu Bandul Sederhana?</h3>
+                <p>Bandul sederhana adalah sistem yang terdiri dari sebuah massa (disebut bandul atau bob) yang digantung pada tali ringan dengan panjang tertentu, dan dapat berayun bebas di bawah pengaruh gravitasi.</p>
+                <p>Contoh dalam kehidupan: jam bandul (pendulum clock), ayunan di taman bermain, dan sensor seismograf untuk mendeteksi gempa.</p>
+                
+                <h3>Mengapa Bandul Berayun?</h3>
+                <p>Ketika bandul ditarik dari posisi seimbangnya (vertikal), muncul dua gaya:</p>
+                <ul>
+                    <li><strong>Gaya Gravitasi</strong>: Menarik massa ke bawah</li>
+                    <li><strong>Tegangan Tali</strong>: Menarik massa ke titik gantungan</li>
+                </ul>
+                <p>Komponen gaya gravitasi yang tegak lurus dengan tali menciptakan <strong>gaya pemulih</strong> yang selalu menarik bandul kembali ke posisi seimbang. Gaya ini sebanding dengan sudut simpangan (untuk sudut kecil), menghasilkan gerak harmonik!</p>
+
+                <h3>Persamaan Kunci:</h3>
+                
+                <p><strong>1. Persamaan Gerak:</strong></p>
+                <p>Persamaan diferensial yang menggambarkan gerak bandul:</p>
+                <div class="formula">$$\frac{d^2\theta}{dt^2} = -\frac{g}{L} \sin\theta$$</div>
+                <p class="formula-explanation">→ Percepatan sudut bergantung pada gravitasi, panjang tali, dan sinus sudut</p>
+                
+                <p><strong>2. Aproksimasi Sudut Kecil (θ < 15°):</strong></p>
+                <p>Untuk sudut kecil, $\sin\theta \approx \theta$ (dalam radian), sehingga:</p>
+                <div class="formula">$$\frac{d^2\theta}{dt^2} \approx -\frac{g}{L} \theta$$</div>
+                <p class="formula-explanation">→ Ini adalah bentuk standar <strong>Gerak Harmonik Sederhana</strong> dengan $\omega^2 = g/L$</p>
+                
+                <p><strong>3. Periode Ayunan:</strong></p>
+                <p>Waktu yang dibutuhkan untuk satu ayunan lengkap (bolak-balik):</p>
+                <div class="formula">$$T = 2\pi\sqrt{\frac{L}{g}}$$</div>
+                <p class="formula-explanation">→ Periode <strong>TIDAK bergantung</strong> pada massa!</p>
+                <p class="formula-explanation">→ Periode <strong>HANYA bergantung</strong> pada panjang tali dan gravitasi</p>
+                <p class="formula-explanation">→ Tali lebih panjang = periode lebih lama (ayunan lebih lambat)</p>
+                
+                <p><strong>4. Frekuensi:</strong></p>
+                <p>Jumlah ayunan per detik:</p>
+                <div class="formula">$$f = \frac{1}{T} = \frac{1}{2\pi}\sqrt{\frac{g}{L}}$$</div>
+                <p class="formula-explanation">→ Kebalikan dari periode</p>
+                
+                <p><strong>5. Kecepatan Linear:</strong></p>
+                <p>Kecepatan bandul pada lintasannya:</p>
+                <div class="formula">$$v = L\omega = L\frac{d\theta}{dt}$$</div>
+                <p class="formula-explanation">→ Maksimum di posisi terendah (titik seimbang)</p>
+                <p class="formula-explanation">→ Nol di posisi tertinggi (titik balik)</p>
+                
+                <p><strong>6. Energi Kinetik:</strong></p>
+                <p>Energi gerak bandul:</p>
+                <div class="formula">$$E_k = \frac{1}{2}mv^2 = \frac{1}{2}m(L\omega)^2$$</div>
+                <p class="formula-explanation">→ Maksimum saat melewati titik terendah (kecepatan maksimum)</p>
+                
+                <p><strong>7. Energi Potensial:</strong></p>
+                <p>Energi potensial gravitasi relatif terhadap titik terendah:</p>
+                <div class="formula">$$E_p = mgh = mgL(1 - \cos\theta)$$</div>
+                <p class="formula-explanation">→ Maksimum di titik tertinggi ayunan</p>
+                <p class="formula-explanation">→ Nol di titik terendah (posisi referensi)</p>
+                
+                <p><strong>8. Hukum Kekekalan Energi:</strong></p>
+                <div class="formula">$$E_{total} = E_k + E_p = \text{konstan}$$</div>
+                <p class="formula-explanation">→ Energi berubah bentuk dari kinetik ke potensial dan sebaliknya</p>
+                <p class="formula-explanation">→ Total energi tetap (tanpa gesekan)</p>
+
+                <h3>Apa yang Ditunjukkan Simulasi Ini?</h3>
+                <ul>
+                    <li><strong>Bandul Biru</strong>: Massa yang berayun di ujung tali</li>
+                    <li><strong>Tali Ungu</strong>: Menghubungkan massa ke titik pivot (dapat dinonaktifkan)</li>
+                    <li><strong>Garis Putus-Putus Merah</strong>: Menunjukkan posisi vertikal seimbang</li>
+                    <li><strong>Info Panel Kiri</strong>: Menampilkan nilai real-time:
+                        <ul>
+                            <li>Sudut saat ini (θ)</li>
+                            <li>Kecepatan sudut (ω)</li>
+                            <li>Percepatan sudut (α)</li>
+                            <li>Energi kinetik dan potensial</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3>Coba Eksperimen!</h3>
+                <ul>
+                    <li><strong>Ubah sudut awal</strong>: Perhatikan bahwa periode hampir tetap untuk sudut kecil (< 30°)</li>
+                    <li><strong>Ubah panjang tali</strong>: Tali lebih panjang membuat ayunan lebih lambat</li>
+                    <li><strong>Ubah massa</strong>: Perhatikan periode TIDAK berubah! (Ini yang membuat bandul berguna untuk jam)</li>
+                    <li><strong>Amati energi</strong>: Saat bandul di titik tertinggi, semua energi adalah potensial. Di titik terendah, semua menjadi kinetik!</li>
+                    <li><strong>Sudut besar (> 45°)</strong>: Perhatikan periode sedikit lebih lama dari prediksi rumus (karena aproksimasi sudut kecil tidak berlaku)</li>
+                </ul>
+                
+                <h3>Aplikasi dalam Kehidupan:</h3>
+                <ul>
+                    <li><strong>Jam Bandul</strong>: Periode yang konsisten digunakan untuk mengukur waktu</li>
+                    <li><strong>Menghitung Gravitasi</strong>: Dengan mengukur T dan L, kita bisa hitung g di lokasi berbeda</li>
+                    <li><strong>Seismograf</strong>: Mendeteksi getaran bumi saat gempa</li>
+                    <li><strong>Metronom</strong>: Alat untuk menjaga tempo musik</li>
+                </ul>
+                
+                <p><strong>Dimana:</strong></p>
+                <ul>
+                    <li>$\theta$ = sudut simpangan dari vertikal (radian atau derajat)</li>
+                    <li>$L$ = panjang tali bandul (m)</li>
+                    <li>$g = 9.8 \text{ m/s}^2$ = percepatan gravitasi di permukaan Bumi</li>
+                    <li>$T$ = periode osilasi (detik) - waktu untuk satu ayunan penuh</li>
+                    <li>$f$ = frekuensi (Hz) - jumlah ayunan per detik</li>
+                    <li>$m$ = massa bandul (kg)</li>
+                    <li>$\omega$ = kecepatan sudut (rad/s) - seberapa cepat sudut berubah</li>
+                    <li>$h$ = ketinggian dari titik terendah (m)</li>
+                    <li>$v$ = kecepatan linear (m/s) - kecepatan massa pada lintasan</li>
+                </ul>
+                
+                <h3>Fakta Menarik!</h3>
+                <p>Galileo Galilei menemukan sifat-sifat bandul dengan mengamati lampu gantung di gereja yang berayun. Ia menggunakan denyut nadinya sebagai stopwatch dan menemukan bahwa periode tidak bergantung pada amplitudo (untuk sudut kecil)! Penemuan ini menjadi dasar jam bandul pertama.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- KaTeX for math rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script type="module" src="main.js"></script>
+    <script>
+        // Theory Modal functionality
+        const modal = document.getElementById('theoryModal');
+        const theoryBtn = document.getElementById('theoryBtn');
+        const closeBtn = document.querySelector('.close');
+
+        theoryBtn.addEventListener('click', function() {
+            modal.style.display = 'block';
+            // Render LaTeX formulas when modal opens
+            setTimeout(function() {
+                renderMathInElement(document.querySelector('.theory-content'), {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }, 100);
+        });
+
+        closeBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Render LaTeX formulas when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+</body>
+</html>
